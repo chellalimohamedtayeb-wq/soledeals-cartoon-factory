@@ -1,5 +1,6 @@
 import React from 'react';
-import {AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
+import {AbsoluteFill, Audio, Sequence, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
+import voiceTiming from './voice-timing.generated.json';
 
 /**
  * Reusable original Sol and Dex vector characters.
@@ -10,6 +11,10 @@ const INK = '#202532';
 const BLUE = '#1767ED';
 const IVORY = '#FBF9F3';
 type Character = 'sol' | 'dex';
+type VoiceClip = {id:string;who:'sol'|'dex';text:string;startFrame:number;durationFrames:number;filename:string;characters:{char:string;startFrame:number;endFrame:number}[]};
+const voiceClips = (voiceTiming.clips as VoiceClip[]);
+const speakingFromVoice = (who: Character, frame: number) =>
+ voiceClips.some(clip=>clip.who===who && clip.characters.some(c=>/\S/.test(c.char) && frame>=c.startFrame && frame<c.endFrame));
 const clamp = {extrapolateLeft: 'clamp' as const, extrapolateRight: 'clamp' as const};
 
 const Face: React.FC<{who: Character; emotion?: 'normal'|'happy'|'shock'|'angry'|'laugh'|'confused'; speaking?: boolean; frame: number}> = ({who,emotion='normal',speaking=false,frame}) => {
@@ -52,7 +57,7 @@ const Actor: React.FC<{who: Character; x: number; y: number; scale?: number; emo
  const f=useCurrentFrame();
  const hop=Math.sin(f*0.55)*bounce;
  return <div style={{position:'absolute',left:x,top:y,width:360,height:490,transform:`translateY(${hop}px) rotate(${angle}deg) scale(${scale})`,transformOrigin:'center bottom'}}>
-   <Face who={who} emotion={emotion} speaking={speaking} frame={f}/>
+   <Face who={who} emotion={emotion} speaking={voiceTiming.enabled?speakingFromVoice(who,f):speaking} frame={f}/>
  </div>;
 };
 
@@ -81,6 +86,7 @@ const Timeline:React.FC = ()=> {
   <div style={{position:'absolute',left:60,right:60,top:1410,height:5,backgroundColor:'#DBDDE2'}}/>
  </AbsoluteFill>;
  return <AbsoluteFill>{background}
+  {voiceTiming.enabled && voiceClips.map(clip=><Sequence key={clip.id} from={clip.startFrame} durationInFrames={clip.durationFrames}><Audio src={staticFile('voice/'+clip.filename)} /></Sequence>)}
   {scene===0&&<>
     <Actor who="sol" x={210} y={700} scale={1.2} emotion="happy" bounce={5} angle={-6}/>
     <Router x={385} y={1090} scale={1.08} heart/>
