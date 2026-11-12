@@ -34,3 +34,12 @@ No API secrets belong in this repository. Render deployment or paid cron resourc
 
 ## Privacy
 The repository was detected as **public**. To make it private: GitHub > Settings > General > Danger Zone > Change repository visibility.
+
+## ElevenLabs voiced preview (manual, credit-consuming)
+- Picked voices: Sol = Jonah Vale (`vveagfomyMCJLZsOPRP2`); Dex = Roger (`CwhRBWXzGAHq8TQ4Fs17`).
+- Add a GitHub Actions secret called `ELEVENLABS_API_KEY` in repository Settings > Secrets and variables > Actions. **Do not put the key in source code or chat.**
+- Run **Build ElevenLabs voiced preview** manually in GitHub Actions; this spends ElevenLabs characters/credits.
+- The generator calls ElevenLabs text-to-speech with timestamps and inserts audio aligned to explicit scene frames. If the spoken line is longer than the allocated slot, the job fails safely instead of truncating it.
+- The generated audio and timing JSON are deliberately ignored by Git. The preview MP4 is a private workflow artifact retained 7 days.
+- The voice service account and workspace API access are separate from the ChatGPT app connection; an API key is required.
+- No automatic voice generation, deployment, or public posting is enabled. Approval is required before publishing.
