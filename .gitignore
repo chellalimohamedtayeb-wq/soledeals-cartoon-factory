@@ -6,3 +6,5 @@ dist/
 !.env.example
 *.mp4
 .DS_Store
+public/voice/
+src/voice-timing.generated.json
