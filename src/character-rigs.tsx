@@ -13,7 +13,7 @@ type Feeling='warm'|'doubt'|'surprise'|'jealous'|'laugh'|'sulk'|'deadpan';
 type ArmMode='hug'|'accuse'|'flail'|'cross'|'normal'|'shock'|'phone'|'laugh'|'facepalm';
 type Character='sol'|'dex';
 type Point={x:number;y:number};
-type PuppetProps={x:number;y:number;s?:number;rot?:number;emotion:Feeling;mouth?:boolean;arms?:ArmMode;bounce?:number;hug?:boolean};
+type PuppetProps={x:number;y:number;s?:number;rot?:number;emotion:Feeling;mouth?:boolean;arms?:ArmMode;bounce?:number;hug?:boolean;holdingRouter?:boolean;startle?:number;eyeDirection?:number};
 const line={fill:'none',stroke:ink,strokeWidth:18,strokeLinecap:'round' as const,strokeLinejoin:'round' as const};
 const transform=(p:Point)=>'translate('+p.x+' '+p.y+')';
 const q=(f:number,a:number,b:number,v:number,w:number)=>interpolate(f,[a,b],[v,w],clamp);
@@ -28,6 +28,20 @@ const Segment:React.FC<{a:Point;b:Point;bend:number;weight?:number;hand?:boolean
    <path d={bone(a,b,j)}/>
    <circle cx={j.x} cy={j.y} r={weight*.43} fill={paper} stroke={ink} strokeWidth="5"/>
    {hand&&<ellipse cx={b.x} cy={b.y} rx="13" ry="10" fill={paper} stroke={ink} strokeWidth="5"/>}
+ </g>;
+};
+const HeldRouter:React.FC<{f:number;startle:number}> = ({f,startle}) => {
+ const pulse=Math.sin(f*.24),vibration=Math.sin(f*1.25)*(startle>0?startle*3:0);
+ return <g transform={'translate('+(75+vibration)+' '+(95+pulse*2)+') rotate('+Math.sin(f*.11)*2+')'}>
+  <ellipse cy="37" rx="118" ry="14" fill={ink} opacity=".08"/>
+  <g stroke={ink} strokeWidth="7" fill="none" strokeLinecap="round">
+   <path d={'M-66 -39 L'+(-77+pulse*3)+' -150 M69 -39 L'+(76-pulse*4)+' -151'}/>
+  </g>
+  <rect x="-113" y="-46" width="227" height="108" rx="22" fill="#E7EFFC" stroke={ink} strokeWidth="8"/>
+  <path d="M-75 10 H-2" stroke={ink} strokeWidth="6" strokeLinecap="round"/>
+  <circle cx="75" cy="12" r="11" fill={blue} opacity={f%29<20?1:.3}/>
+  <path d={'M-33 -93 Q0 '+(-122+pulse*7)+' 31 -93'} stroke={blue} strokeWidth="6" fill="none" strokeLinecap="round"/>
+  <path d="M-25 66 L-35 80 M82 65 L91 81" stroke={ink} strokeWidth="8" strokeLinecap="round"/>
  </g>;
 };
 const Torso:React.FC<{who:Character}> =({who})=><g>
@@ -48,18 +62,18 @@ const Head:React.FC<{who:Character;emotion:Feeling;mouth?:boolean;frame:number}>
   {mouth?<ellipse cx="0" cy="-129" rx={shock?19:15} ry={7+14*Math.abs(Math.sin(frame*.83))} fill={ink}/>:laugh?<path d="M-29 -154 Q0 -85 35 -154Z" fill={ink}/>:shock?<ellipse cx="0" cy="-129" rx="21" ry="28" fill={ink}/>:happ?<path d="M-28 -133 Q0 -106 27 -131" {...line} strokeWidth="6"/>:angry?<path d="M-23 -117 Q0 -147 28 -118" {...line} strokeWidth="7"/>:<path d="M-20 -135 Q1 -143 23 -135" {...line} strokeWidth="6"/>}
   </g>;
 };
-const Puppet:React.FC<PuppetProps&{who:Character}> =({who,x,y,s=1,rot=0,emotion,mouth=false,arms='normal',bounce=0,hug=false})=>{
+const Puppet:React.FC<PuppetProps&{who:Character}> =({who,x,y,s=1,rot=0,emotion,mouth=false,arms='normal',bounce=0,hug=false,holdingRouter=false,startle=0,eyeDirection=0})=>{
  const f=useCurrentFrame(),sol=who==='sol',wobble=Math.sin(f*.22)*bounce;
  const breath=Math.sin(f*.13)*2.3;
  const squish=emotion==='surprise'?1+0.035*Math.sin(f*.45):1;
  const step=arms==='shock'?Math.sin(f*.68)*18:arms==='laugh'?Math.sin(f*.5)*23:arms==='flail'?Math.sin(f*.8)*25:3*Math.sin(f*.12);
- const shake=emotion==='surprise'?Math.sin(f*1.1)*3:0;
+ const shake=emotion==='surprise'?Math.sin(f*1.1)*(3+startle*3):0;
  const bodyLean=arms==='hug'?Math.sin(f*.21)*2.2:emotion==='laugh'?Math.sin(f*.44)*4:0;
  const leftShoulder={x:-84,y:10},rightShoulder={x:86,y:10};
  const target= (side:'l'|'r'):Point=>{
    const sign=side==='l'?-1:1;
    const wave=Math.sin(f*(arms==='flail'?1.1:.43)+(side==='l'?0:1.1));
-   if(arms==='hug'||hug)return side==='l'?{x:-14+wave*4,y:114+wave*2}:{x:167-wave*5,y:110+wave*3};
+   if(arms==='hug'||hug)return side==='l'?{x:-30+wave*3,y:130+wave*3}:{x:170-wave*4,y:118+wave*2};
    if(arms==='flail'||arms==='shock')return {x:sign*(171+wave*13),y:-120+wave*38};
    if(arms==='accuse')return side==='r'?{x:227,y:-74+wave*6}:{x:-127,y:81};
    if(arms==='cross')return side==='l'?{x:69,y:59}:{x:-68,y:52};
@@ -74,7 +88,8 @@ const Puppet:React.FC<PuppetProps&{who:Character}> =({who,x,y,s=1,rot=0,emotion,
   <ellipse cx="0" cy="254" rx="93" ry="12" fill={ink} opacity=".10"/>
   {leg(-1)}{leg(1)}
   <Torso who={who}/>
-  {/* Arms can pass in front of the torso; hands track moving target independently */}
+  {holdingRouter&&who==='sol'&&<HeldRouter f={f} startle={startle}/>}
+  {/* Arms and wrists are drawn over held objects, so the grasp stays attached to the body */}
   <Segment a={leftShoulder} b={left} bend={arms==='hug'||hug?-44:arms==='cross'?22:-35} weight={20}/>
   <Segment a={rightShoulder} b={right} bend={arms==='hug'||hug?52:arms==='cross'?-20:36} weight={20}/>
   <Head who={who} emotion={emotion} mouth={mouth} frame={f}/>
