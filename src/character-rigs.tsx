@@ -38,24 +38,28 @@ const Torso:React.FC<{who:Character}> =({who})=><g>
 const Head:React.FC<{who:Character;emotion:Feeling;mouth?:boolean;frame:number}> =({who,emotion,mouth=false,frame})=>{
  const sol=who==='sol',blink=frame%(sol?103:89)<3,shock=emotion==='surprise',angry=emotion==='jealous'||emotion==='sulk',laugh=emotion==='laugh',happ=emotion==='warm';
  const brow=angry?'M-65 -225 L-22 -208 M28 -208 L71 -228':shock?'M-68 -246 L-25 -261 M29 -259 L73 -246':'M-69 -231 L-23 -235 M27 -235 L71 -228';
- const headTilt=sol ? (happ?-7:angry?8:shock?-7:0) : (laugh?12:shock?-9:emotion==='doubt'?7:0);
+ const headTilt=sol ? (happ?-10:angry?11:shock?-13:0) : (laugh?17:shock?-12:emotion==='doubt'?9:0);
  const bob=(mouth?Math.sin(frame*.9)*2:Math.sin(frame*.2)*1.5);
+ const gaze=shock?Math.sin(frame*.21)*3:emotion==='doubt'?5:0;
  return <g transform={'translate(0 '+bob+') rotate('+headTilt+' 0 -90)'}>
   {sol?<><path d="M-106 -223 C-104 -321 61 -312 107 -235 C139 -157 103 -64 13 -59 C-80 -55 -128 -127 -106 -223Z" fill={paper} stroke={ink} strokeWidth="8"/><path d="M-20 -296 Q-32 -320 -17 -332 M2 -294 Q20 -314 11 -338" {...line} strokeWidth="6"/></>:<path d="M-106 -258 Q-62 -300 78 -276 Q126 -249 112 -191 L102 -114 Q78 -75 -7 -78 Q-94 -74 -111 -135 Q-131 -207 -106 -258Z" fill={paper} stroke={ink} strokeWidth="8"/>}
   <path d={brow} {...line} strokeWidth="7"/>
-  {blink?<g {...line} strokeWidth="5"><path d="M-65 -192 H-25 M26 -192 H65"/></g>:shock?<g fill="#fff" stroke={ink} strokeWidth="5"><ellipse cx="-44" cy="-191" rx="21" ry="29"/><ellipse cx="44" cy="-191" rx="21" ry="29"/><circle cx="-39" cy="-185" r="6" fill={ink}/><circle cx="39" cy="-185" r="6" fill={ink}/></g>:<g fill={ink}><ellipse cx="-44" cy="-193" rx="6" ry="11"/><ellipse cx="43" cy="-193" rx="6" ry="11"/></g>}
+  {blink?<g {...line} strokeWidth="5"><path d="M-65 -192 H-25 M26 -192 H65"/></g>:shock?<g fill="#fff" stroke={ink} strokeWidth="5"><ellipse cx="-44" cy="-191" rx="21" ry="29"/><ellipse cx="44" cy="-191" rx="21" ry="29"/><circle cx="-39" cy="-185" r="6" fill={ink}/><circle cx="39" cy="-185" r="6" fill={ink}/></g>:<g fill={ink}><ellipse cx="-44" cy="-193" rx="6" ry="11" transform={"translate("+gaze+" 0)"}/><ellipse cx="43" cy="-193" rx="6" ry="11" transform={"translate("+gaze+" 0)"}/></g>}
   {mouth?<ellipse cx="0" cy="-129" rx={shock?19:15} ry={7+14*Math.abs(Math.sin(frame*.83))} fill={ink}/>:laugh?<path d="M-29 -154 Q0 -85 35 -154Z" fill={ink}/>:shock?<ellipse cx="0" cy="-129" rx="21" ry="28" fill={ink}/>:happ?<path d="M-28 -133 Q0 -106 27 -131" {...line} strokeWidth="6"/>:angry?<path d="M-23 -117 Q0 -147 28 -118" {...line} strokeWidth="7"/>:<path d="M-20 -135 Q1 -143 23 -135" {...line} strokeWidth="6"/>}
   </g>;
 };
 const Puppet:React.FC<PuppetProps&{who:Character}> =({who,x,y,s=1,rot=0,emotion,mouth=false,arms='normal',bounce=0,hug=false})=>{
  const f=useCurrentFrame(),sol=who==='sol',wobble=Math.sin(f*.22)*bounce;
+ const breath=Math.sin(f*.13)*2.3;
+ const squish=emotion==='surprise'?1+0.035*Math.sin(f*.45):1;
  const step=arms==='shock'?Math.sin(f*.68)*18:arms==='laugh'?Math.sin(f*.5)*23:arms==='flail'?Math.sin(f*.8)*25:3*Math.sin(f*.12);
  const shake=emotion==='surprise'?Math.sin(f*1.1)*3:0;
+ const bodyLean=arms==='hug'?Math.sin(f*.21)*2.2:emotion==='laugh'?Math.sin(f*.44)*4:0;
  const leftShoulder={x:-84,y:10},rightShoulder={x:86,y:10};
  const target= (side:'l'|'r'):Point=>{
    const sign=side==='l'?-1:1;
    const wave=Math.sin(f*(arms==='flail'?1.1:.43)+(side==='l'?0:1.1));
-   if(arms==='hug'||hug)return side==='l'?{x:58+wave*6,y:139+wave*2}:{x:145-wave*7,y:102+wave*6};
+   if(arms==='hug'||hug)return side==='l'?{x:-14+wave*4,y:114+wave*2}:{x:167-wave*5,y:110+wave*3};
    if(arms==='flail'||arms==='shock')return {x:sign*(171+wave*13),y:-120+wave*38};
    if(arms==='accuse')return side==='r'?{x:227,y:-74+wave*6}:{x:-127,y:81};
    if(arms==='cross')return side==='l'?{x:69,y:59}:{x:-68,y:52};
@@ -65,8 +69,8 @@ const Puppet:React.FC<PuppetProps&{who:Character}> =({who,x,y,s=1,rot=0,emotion,
    return {x:sign*125,y:122+wave*6};
  };
  const left=target('l'),right=target('r');
- const leg=(sign:number)=>{const hip={x:sign*41,y:118},ankle={x:sign*(57+step*.2),y:235-Math.max(0,sign*step*.5)};return <Segment a={hip} b={ankle} bend={sign*(25+step*.3)} weight={21} hand={false}/>;};
- return <g transform={'translate('+x+' '+(y+wobble)+') rotate('+(rot+shake)+') scale('+s+')'}>
+ const leg=(sign:number)=>{const hip={x:sign*41,y:118},ankle={x:sign*(57+step*.2),y:235-Math.max(0,sign*step*.5)};return <g key={sign}><Segment a={hip} b={ankle} bend={sign*(25+step*.3)} weight={21} hand={false}/><path d={'M'+(ankle.x-25)+' '+(ankle.y+8)+' Q'+ankle.x+' '+(ankle.y+17)+' '+(ankle.x+28)+' '+(ankle.y+8)} fill="none" stroke={ink} strokeWidth="12" strokeLinecap="round"/></g>;};
+ return <g transform={'translate('+x+' '+(y+wobble+breath)+') rotate('+(rot+shake+bodyLean)+') scale('+s*squish+' '+s/squish+')'}>
   <ellipse cx="0" cy="254" rx="93" ry="12" fill={ink} opacity=".10"/>
   {leg(-1)}{leg(1)}
   <Torso who={who}/>
