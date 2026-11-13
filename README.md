@@ -36,7 +36,7 @@ No API secrets belong in this repository. Render deployment or paid cron resourc
 The repository was detected as **public**. To make it private: GitHub > Settings > General > Danger Zone > Change repository visibility.
 
 ## ElevenLabs voiced preview (manual, credit-consuming)
-- Picked voices: Sol = Jonah Vale (`vveagfomyMCJLZsOPRP2`); Dex = Roger (`CwhRBWXzGAHq8TQ4Fs17`).
+- Picked voices: Sol = George (`JBFqnCBsd6RMkjVDRZzb`); Dex = Daniel (`onwK4e9ZLuTAKqWW03F9`), as default-voice candidates; their availability under the current account has not yet been verified.
 - Add a GitHub Actions secret called `ELEVENLABS_API_KEY` in repository Settings > Secrets and variables > Actions. **Do not put the key in source code or chat.**
 - Run **Build ElevenLabs voiced preview** manually in GitHub Actions; this spends ElevenLabs characters/credits.
 - The generator calls ElevenLabs text-to-speech with timestamps and inserts audio aligned to explicit scene frames. If the spoken line is longer than the allocated slot, the job fails safely instead of truncating it.
