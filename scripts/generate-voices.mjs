@@ -13,15 +13,16 @@ if (!key) {
 }
 
 const voiceIds = {
-  sol: process.env.SOL_VOICE_ID || 'vveagfomyMCJLZsOPRP2', // Jonah Vale
+  sol: process.env.SOL_VOICE_ID || 'JBFqnCBsd6RMkjVDRZzb', // George: ElevenLabs documented default voice; test access on this workspace
   dex: process.env.DEX_VOICE_ID || 'CwhRBWXzGAHq8TQ4Fs17', // Roger
 };
 
 const FPS=30;
 // Fixed spots in the CURRENT 18-second Wi-Fi storyboard. Check audio fit before publishing.
 const lines = [
- {id:'dex-question',who:'dex',text:'Why are you hugging the router?!',startFrame:40,maxEndFrame:105},
+ // Check Sol FIRST because the earlier custom Library voice caused HTTP 402; do not charge Dex again if Sol is blocked.
  {id:'sol-connection',who:'sol',text:'My therapist said I need a stronger connection.',startFrame:133,maxEndFrame:245},
+ {id:'dex-question',who:'dex',text:'Why are you hugging the router?!',startFrame:40,maxEndFrame:105},
  {id:'dex-discovery',who:'dex',text:"It's connected to twelve other devices.",startFrame:270,maxEndFrame:355},
  {id:'sol-twelve',who:'sol',text:'TWELVE?!',startFrame:362,maxEndFrame:399},
  {id:'sol-exclusive',who:'sol',text:'I THOUGHT WE WERE EXCLUSIVE!',startFrame:399,maxEndFrame:485},
