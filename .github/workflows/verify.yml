@@ -1,6 +1,13 @@
 name: Verify SoleDeals Remotion project
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'scripts/**'
+      - '.github/workflows/verify.yml'
 jobs:
   typecheck-and-render:
     runs-on: ubuntu-latest
