@@ -29,9 +29,14 @@ jobs:
         run: npm run typecheck
       - name: Render MP4 with synchronized voice clips
         run: npm run render
+      - name: Balance dialogue volume and limit peaks (broadcast-friendly)
+        run: |
+          ffmpeg -hide_banner -loglevel error -y -i out/soledeals-wifi.mp4 \
+            -af "highpass=f=75,acompressor=threshold=-22dB:ratio=2.4:attack=8:release=100,loudnorm=I=-16:TP=-1.5:LRA=9" \
+            -c:v copy -c:a aac -b:a 192k -movflags +faststart out/soledeals-wifi-mastered.mp4
       - name: Upload private video preview
         uses: actions/upload-artifact@v4
         with:
           name: soledeals-wifi-voiced-preview
-          path: out/soledeals-wifi.mp4
+          path: out/soledeals-wifi-mastered.mp4
           retention-days: 7
