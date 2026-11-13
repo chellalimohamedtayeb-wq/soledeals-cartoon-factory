@@ -79,20 +79,19 @@ const Burst:React.FC<{x:number;y:number}> =({x,y})=><g transform={'translate('+x
 export const WifiEpisodeV4:React.FC=()=>{
  const f=useCurrentFrame();
  const scene=f<105?0:f<245?1:f<355?2:f<485?3:4;
- const solJump=scene===3?lerp(f,355,372,365,120):365;
+ const solJump=scene===3?lerp(f,355,372,365,255):365;
  const solRise=scene===3?Math.sin(Math.max(0,Math.min(1,(f-355)/29))*Math.PI)*-205:0;
  const dexEnter=scene===0?lerp(f,0,31,1190,760):760;
  const routerBack=scene===4?lerp(f,492,528,590,430):590;
  const entrance=scene===0?lerp(f,0,22,0,1):1;
- const zoom=scene===0?1.32+0.09*entrance:scene===1?1.43:scene===2?1.25:scene===3?1.32+0.16*Math.exp(-Math.pow((f-400)/15,2)):1.3;
- const focus=scene<=1?490:scene===2?560:scene===3?420:530;
+ const zoom=scene===0?1.13+0.09*entrance:scene===1?1.13:scene===2?1.14:scene===3?1.10+0.06*Math.exp(-Math.pow((f-400)/15,2)):1.1;
+ const focus=scene===0?495:scene===1?525:scene===2?540:scene===3?535:540;
  const shake=scene===3&&f>395&&f<425?Math.sin(f*2.7)*13*(1-(f-395)/30):0;
  return <AbsoluteFill style={{backgroundColor:C.paper,overflow:'hidden'}}>
    {voiceTiming.enabled&&clips.map(clip=><Sequence key={clip.id} from={clip.startFrame} durationInFrames={clip.durationFrames}><Audio src={staticFile('voice/'+clip.filename)}/></Sequence>)}
    <svg width="1080" height="1920" viewBox="0 0 1080 1920" style={{position:'absolute',inset:0}}>
      <g transform={'translate('+(540+shake)+' 950) scale('+zoom+') translate('+(-focus)+' -950)'}><path d="M0 1338 H1080" stroke="#D7DBE3" strokeWidth="8"/>
-     <g fill={C.blue} fontFamily="Arial,sans-serif" fontWeight="900"><text x="75" y="126" fontSize="29" letterSpacing="3">SOLEDEALS ORIGINALS</text></g>
-     <g fill={C.ink} fontFamily="Arial,sans-serif" fontWeight="900"><text x="74" y="200" fontSize="50">THE WI-FI PROBLEM</text></g>
+
      {scene===0&&<>
        <Sol x={365} y={970} s={1.38} rot={-10+Math.sin(f*.2)*3} emotion="warm" bounce={5}/>
        <Router x={470} y={1090} s={1.18} happiness/>
@@ -143,6 +142,8 @@ export const WifiEpisodeV4:React.FC=()=>{
      </>}
      </g>
    </svg>
+   <div style={{position:'absolute',top:76,left:64,fontFamily:'Arial,sans-serif',color:C.blue,fontWeight:900,fontSize:28,letterSpacing:3}}>SOLEDEALS ORIGINALS</div>
+   <div style={{position:'absolute',top:120,left:64,fontFamily:'Arial,sans-serif',color:C.ink,fontWeight:900,fontSize:44}}>THE WI-FI PROBLEM</div>
    {scene===0&&f>=38&&<Card text="Why are you hugging the router?!"/>}
    {scene===1&&f>=131&&<Card text={f<199?"My therapist said I need...":"a STRONGER CONNECTION."} big={f>=199}/>}
    {scene===2&&f>=270&&<Card text="It's connected to TWELVE other devices."/>}
