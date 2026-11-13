@@ -14,7 +14,7 @@ if (!key) {
 
 const voiceIds = {
   sol: process.env.SOL_VOICE_ID || 'JBFqnCBsd6RMkjVDRZzb', // George: ElevenLabs documented default voice; test access on this workspace
-  dex: process.env.DEX_VOICE_ID || 'CwhRBWXzGAHq8TQ4Fs17', // Roger
+  dex: process.env.DEX_VOICE_ID || 'onwK4e9ZLuTAKqWW03F9', // Daniel: documented default; test access on this workspace
 };
 
 const FPS=30;
