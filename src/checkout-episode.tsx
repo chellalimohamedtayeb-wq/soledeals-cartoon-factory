@@ -138,7 +138,8 @@ export const SoleDealsCheckout:React.FC=()=>{
  const quake=f>408&&f<431?Math.sin(f*1.2)*12:0;
  return <AbsoluteFill style={{background:K.ivory,overflow:'hidden'}}>
   {timings.enabled&&voiceClips.map(c=><Sequence key={c.id} from={c.startFrame} durationInFrames={c.durationFrames}><Audio src={staticFile('checkout-voice/'+c.filename)}/></Sequence>)}
-  <div style={{position:'absolute',left:60,top:76,color:K.blue,fontFamily:'Arial',fontWeight:900,letterSpacing:4,fontSize:28}}>SOLEDEALS ORIGINALS</div>
+  <div style={{position:'absolute',top:57,left:52,right:52,fontFamily:'Arial,sans-serif',fontSize:49,lineHeight:1.14,fontWeight:900,textAlign:'center',letterSpacing:-1.1,color:K.ink}}>WHEN I ASK MY FRIEND<br/>WHAT I’M WORTH...</div>
+  <div style={{position:'absolute',top:205,left:0,right:0,fontFamily:'Arial,sans-serif',fontSize:21,fontWeight:900,textAlign:'center',letterSpacing:3.5,color:K.blue}}>SOLEDEALS ORIGINALS</div>
   <svg width="1080" height="1920" viewBox="0 0 1080 1920" style={{position:'absolute',inset:0}}>
    <path d="M70 1425 H1010" stroke="#DADDE3" strokeWidth="7"/>
    <g transform={'translate('+quake+' 0)'}>
