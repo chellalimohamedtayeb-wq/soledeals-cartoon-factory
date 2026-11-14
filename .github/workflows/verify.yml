@@ -28,3 +28,10 @@ jobs:
         with:
           name: soledeals-wifi-preview
           path: out/soledeals-wifi.mp4
+      - name: Render new Sol and Dex checkout episode
+        run: npx remotion render src/index.ts SoleDeals-Checkout out/soledeals-checkout.mp4 --codec h264 --concurrency 1
+      - name: Upload checkout preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: soledeals-checkout-preview
+          path: out/soledeals-checkout.mp4
